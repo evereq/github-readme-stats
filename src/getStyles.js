@@ -1,33 +1,24 @@
+// @ts-check
+/**
+ * @param {number} value
+ */
 const calculateCircleProgress = (value) => {
-  let radius = 40;
-  let c = Math.PI * (radius * 2);
+  const radius = 40;
+  const c = Math.PI * (radius * 2);
 
   if (value < 0) value = 0;
   if (value > 100) value = 100;
 
-  let percentage = ((100 - value) / 100) * c;
-  return percentage;
+  return ((100 - value) / 100) * c;
 };
 
-const getAnimations = ({ progress }) => {
+/**
+ *
+ * @param {{progress: number}} param0
+ * @returns
+ */
+const getProgressAnimation = ({ progress }) => {
   return `
-    /* Animations */
-    @keyframes scaleIn {
-      from {
-        transform: translate(-5px, 5px) scale(0);
-      }
-      to {
-        transform: translate(-5px, 5px) scale(1);
-      }
-    }
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
     @keyframes rankAnimation {
       from {
         stroke-dashoffset: ${calculateCircleProgress(0)};
@@ -39,6 +30,37 @@ const getAnimations = ({ progress }) => {
   `;
 };
 
+const getAnimations = () => {
+  return `
+    /* Animations */
+    @keyframes scaleInAnimation {
+      from {
+        transform: translate(-5px, 5px) scale(0);
+      }
+      to {
+        transform: translate(-5px, 5px) scale(1);
+      }
+    }
+    @keyframes fadeInAnimation {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  `;
+};
+
+/**
+ * @param {{
+ *  titleColor?: string | string[]
+ *  textColor?: string | string[]
+ *  iconColor?: string | string[]
+ *  show_icons?: boolean;
+ *  progress?: number;
+ * }} args
+ */
 const getStyles = ({
   titleColor,
   textColor,
@@ -47,20 +69,20 @@ const getStyles = ({
   progress,
 }) => {
   return `
-    .header {
-      font: 600 18px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${titleColor}; 
-      animation: fadeIn 0.8s ease-in-out forwards;
+    .stat {
+      font: 600 14px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif; fill: ${textColor};
     }
-    .stat { 
-      font: 600 14px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${textColor};
+    @supports(-moz-appearance: auto) {
+      /* Selector detects Firefox */
+      .stat { font-size:12px; }
     }
-    .stagger { 
+    .stagger {
       opacity: 0;
-      animation: fadeIn 0.3s ease-in-out forwards;
+      animation: fadeInAnimation 0.3s ease-in-out forwards;
     }
-    .rank-text { 
+    .rank-text {
       font: 800 24px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${textColor}; 
-      animation: scaleIn 0.3s ease-in-out forwards;
+      animation: scaleInAnimation 0.3s ease-in-out forwards;
     }
     
     .bold { font-weight: 700 }
@@ -86,9 +108,8 @@ const getStyles = ({
       transform: rotate(-90deg);
       animation: rankAnimation 1s forwards ease-in-out;
     }
-
-    ${process.env.NODE_ENV === "test" ? "" : getAnimations({ progress })}
+    ${process.env.NODE_ENV === "test" ? "" : getProgressAnimation({ progress })}
   `;
 };
 
-module.exports = getStyles;
+module.exports = { getStyles, getAnimations };
